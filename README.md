@@ -3,7 +3,7 @@
 **nvim-bard** is a minimal plugin to interact with [Bard](https://bard.google.com) using [bardapi](https://github.com/dsdanielpark/Bard-API) python package.
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/89019438/253807316-9486bd73-132e-48c6-8646-68947701ae07.png">
+<img src="https://user-images.githubusercontent.com/89019438/253833546-ecf7830b-c235-4cc8-9dad-9bf2615a0f41.png">
 </p>
 
 ## Requirements
