@@ -66,7 +66,7 @@ function M.create_layout()
     border = {
       style = "single",
       text = {
-        top = "[Query]"
+        top = "[Prompt]"
       }
     }
   })
@@ -87,8 +87,8 @@ function M.create_layout()
 
   top_popup:on(event.BufWinEnter, function()
     vim.cmd('set filetype=markdown')
-    vim.fn.matchadd("Identifier", [[\[?\] ]])
-    vim.fn.matchadd("Statement", [[\[✦\] ]])
+    vim.cmd('hi SignColumn ctermbg=NONE guibg=NONE')
+    vim.cmd('set signcolumn=yes')
   end)
 
   bottom_popup:on(event.BufWinEnter, function()
@@ -106,6 +106,7 @@ function M.create_layout()
       end)
       vim.api.nvim_buf_set_lines(bottom_popup.bufnr, 0, -1, false, {})
       vim.api.nvim_buf_set_lines(top_popup.bufnr, 0, -1, false, {})
+      vim.defer_fn(function() vim.cmd(bardapi) end, 0)
     end,
   {})
   vim.api.nvim_buf_set_keymap(bottom_popup.bufnr, "n", new_chat, "<cmd>BardReset<cr>", {})
@@ -118,21 +119,54 @@ end
 
 function M.get_content()
   local lines = vim.api.nvim_buf_get_lines(bottom_popup.bufnr, 0, -1, false)
-  local query  = table.concat(lines, "\n")
-  lines[1] = "[?] " .. lines[1]
-  table.insert(lines, "")
-  local top_buf_lines = vim.api.nvim_buf_get_lines(top_popup.bufnr, 0, -1, false)
-  if #top_buf_lines > 1 then
-    vim.api.nvim_buf_set_lines(top_popup.bufnr, -1, -1, false, lines)
-  else
+  if vim.api.nvim_buf_line_count(top_popup.bufnr) == 1 then
     vim.fn.execute([[py3 token = "]] .. bard_api_key .. [["]])
-    vim.api.nvim_buf_set_lines(top_popup.bufnr, 0, -1, false, lines)
     vim.defer_fn(function() vim.cmd(bardapi) end, 0)
   end
-  vim.api.nvim_buf_set_lines(bottom_popup.bufnr, 0, -1, false, {})
+  local query  = table.concat(lines, "\n")
+  M.write_top_buffer(lines, "input")
   vim.defer_fn(function()
     M.ask_bard(query)
   end, 0)
+end
+
+function M.write_top_buffer(lines, type)
+
+  local buf = top_popup.bufnr
+  local sign = vim.fn.sign_define
+
+  local placelist = {}
+
+  sign('first_line_input', { text = '', texthl = 'Function'  })
+  sign('lines_input',      { text = '│', texthl = 'Function'  })
+  sign('last_line_input',  { text = '╰', texthl = 'Function'  })
+  sign('first_line_bard',  { text = '🟆', texthl = 'Statement' })
+  sign('lines_bard',       { text = '│', texthl = 'Statement' })
+  sign('last_line_bard',   { text = '╰', texthl = 'Statement' })
+
+  local line_count = vim.api.nvim_buf_line_count(buf)
+
+  local function check_first_line()
+    if line_count == 1 then return 0 else return line_count end
+  end
+
+  for line = 1, #lines do
+    table.insert(placelist, { name = "lines_" .. type, buffer = buf, lnum = line + check_first_line()})
+  end
+
+  if type == "input" then
+    table.insert(placelist, { name = "last_line_input", buffer = buf, lnum = #lines + check_first_line() })
+    table.insert(placelist, { name = "first_line_input", buffer = buf, lnum = 1 + check_first_line() })
+  elseif type == "bard" then
+    table.insert(placelist, { name = "last_line_bard", buffer = buf, lnum = #lines + line_count })
+    table.insert(placelist, { name = "first_line_bard", buffer = buf, lnum = 1 + line_count })
+  end
+
+  vim.api.nvim_call_function("sign_placelist", { placelist })
+
+  table.insert(lines, "")
+  vim.api.nvim_buf_set_lines(buf, check_first_line(), -1, false, lines)
+  vim.api.nvim_buf_set_lines(bottom_popup.bufnr, 0, -1, false, {})
 end
 
 function M.ask_bard(query)
@@ -144,9 +178,7 @@ function M.ask_bard(query)
     line = line:gsub("%^M", "")
     table.insert(lines, line)
   end
-  lines[1] = "[✦] " .. lines[1]
-  table.insert(lines, "")
-  vim.api.nvim_buf_set_lines(top_popup.bufnr, -1, -1, false, lines)
+  M.write_top_buffer(lines, "bard")
   vim.api.nvim_buf_call(top_popup.bufnr, function()
     vim.cmd('normal G')
   end)
