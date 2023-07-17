@@ -86,9 +86,11 @@ function M.create_layout()
   )
 
   top_popup:on(event.BufWinEnter, function()
-    vim.cmd('set filetype=markdown')
-    vim.cmd('hi SignColumn ctermbg=NONE guibg=NONE')
-    vim.cmd('set signcolumn=yes')
+    vim.api.nvim_buf_call(top_popup.bufnr, function()
+      vim.opt.signcolumn = "yes"
+      vim.bo.filetype = "markdown"
+      vim.cmd('hi SignColumn ctermbg=NONE guibg=NONE')
+    end)
   end)
 
   bottom_popup:on(event.BufWinEnter, function()
@@ -105,6 +107,7 @@ function M.create_layout()
         vim.cmd('normal gg')
       end)
       vim.api.nvim_buf_set_lines(bottom_popup.bufnr, 0, -1, false, {})
+      vim.api.nvim_call_function("sign_unplace", { "*" })
       vim.api.nvim_buf_set_lines(top_popup.bufnr, 0, -1, false, {})
       vim.defer_fn(function() vim.cmd(bardapi) end, 0)
     end,
@@ -167,6 +170,9 @@ function M.write_top_buffer(lines, type)
   table.insert(lines, "")
   vim.api.nvim_buf_set_lines(buf, check_first_line(), -1, false, lines)
   vim.api.nvim_buf_set_lines(bottom_popup.bufnr, 0, -1, false, {})
+  vim.api.nvim_buf_call(top_popup.bufnr, function()
+    vim.cmd('normal G')
+  end)
 end
 
 function M.ask_bard(query)
@@ -179,9 +185,6 @@ function M.ask_bard(query)
     table.insert(lines, line)
   end
   M.write_top_buffer(lines, "bard")
-  vim.api.nvim_buf_call(top_popup.bufnr, function()
-    vim.cmd('normal G')
-  end)
 end
 
 return M
