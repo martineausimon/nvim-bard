@@ -4,6 +4,7 @@ local Popup = require("nui.popup")
 local event = require("nui.utils.autocmd").event
 
 local bard_api_key = Config.options.bard_api_key
+local token = string.format('py3 token = "%s"', bard_api_key)
 local send_bard = Config.options.mappings.send_bard
 local new_chat = Config.options.mappings.new_chat
 
@@ -123,7 +124,7 @@ end
 function M.get_content()
   local lines = vim.api.nvim_buf_get_lines(bottom_popup.bufnr, 0, -1, false)
   if vim.api.nvim_buf_line_count(top_popup.bufnr) == 1 then
-    vim.fn.execute([[py3 token = "]] .. bard_api_key .. [["]])
+    vim.fn.execute(token)
     vim.defer_fn(function() vim.cmd(bardapi) end, 0)
   end
   local query  = table.concat(lines, "\n")
@@ -177,7 +178,8 @@ end
 
 function M.ask_bard(query)
   local escaped_query = vim.fn.escape(query, [["\()]])
-  vim.fn.execute([[py3 answer = bard.get_answer("""]] .. escaped_query .. [["""]] .. ")['content']")
+  local cmd = string.format('py3 answer = bard.get_answer("""%s""")["content"]', escaped_query)
+  vim.fn.execute(cmd)
   local result = vim.fn.execute("py3 print(answer)")
   local lines = {}
   for line in result:gmatch("[^\r\n]+") do
