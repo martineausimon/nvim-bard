@@ -7,6 +7,7 @@ local bard_api_key = Config.options.bard_api_key
 local token = string.format('py3 token = "%s"', bard_api_key)
 local send_bard = Config.options.mappings.send_bard
 local new_chat = Config.options.mappings.new_chat
+local top_popup_options = Config.options.options.top_popup_options
 
 local bard_status
 
@@ -88,9 +89,11 @@ function M.create_layout()
 
   top_popup:on(event.BufWinEnter, function()
     vim.api.nvim_buf_call(top_popup.bufnr, function()
-      vim.opt.signcolumn = "yes"
-      vim.bo.filetype = "markdown"
+      for i, j in pairs(top_popup_options) do
+        vim.opt[i] = j
+      end
       vim.cmd('hi SignColumn ctermbg=NONE guibg=NONE')
+      vim.cmd('hi link markdownError NONE')
     end)
   end)
 

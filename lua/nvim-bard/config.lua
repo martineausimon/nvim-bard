@@ -7,6 +7,13 @@ function M.defaults()
       toggle_bard = "<leader>b",
       send_bard = "<cr>",
       new_chat = "<c-n>"
+    },
+    options = {
+      top_popup_options = {
+        signcolumn = 'yes:1',
+        filetype = 'markdown',
+        conceallevel = 3,
+      }
     }
   }
   return defaults
