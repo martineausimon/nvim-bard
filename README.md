@@ -37,6 +37,13 @@ pip install bardapi
         toggle_bard = "<leader>b",
         send_bard = "<cr>",
         new_chat = "<c-n>"
+      },
+      options = {
+        top_popup_options = {
+          signcolumn = 'yes:1',
+          filetype = 'markdown',
+          conceallevel = 3,
+        }
       }
     })
   end
@@ -56,6 +63,13 @@ use {
         toggle_bard = "<leader>b",
         send_bard = "<cr>",
         new_chat = "<c-n>"
+      },
+      options = {
+        top_popup_options = {
+          signcolumn = 'yes:1',
+          filetype = 'markdown',
+          conceallevel = 3,
+        }
       }
     })
   end
@@ -65,9 +79,10 @@ use {
 **⚠ `__Secure-1PSID` is private !** If you don't want to write this Bard API key in your config directly, you can store it in a local file (e.g. `$HOME/.bard_api_key`), and use the following function:
 
 ```lua
+local api_key
 local file = io.open('/home/user/.bard_api_key', 'r')
 if file then
-  api_key = file:read()
+  local api_key = file:read()
   file:close()
 end
 
@@ -77,11 +92,6 @@ end
   config = function()
     require('nvim-bard').setup({
       bard_api_key = api_key,
-      mappings = {
-        toggle_bard = "<leader>b",
-        send_bard = "<cr>",
-        new_chat = "<c-n>"
-      }
     })
   end
 }
