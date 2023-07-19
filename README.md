@@ -32,44 +32,46 @@ pip install bardapi
   dependencies = 'MunifTanjim/nui.nvim',
   config = function()
     require('nvim-bard').setup({
-      bard_api_key = "xxxxxx",
+      bard_api_key = "", -- Required
       mappings = {
         toggle_bard = "<leader>b",
         send_bard = "<cr>",
         new_chat = "<c-n>"
       },
       options = {
+        ui = {
+          question = {
+            signs = {
+              sign = "",
+              hi = "Function",
+              style = "single"
+            },
+            border = {
+              style = "single",
+              text = {
+                top = "[Prompt]"
+              }
+            }
+          },
+          bard = {
+            signs = {
+              sign = "🟆",
+              hi = "Statement",
+              style = "single"
+            },
+            border = {
+              style = "single",
+              text = {
+                top = "[Bard]"
+              }
+            }
+          }
+        },
         top_popup_options = {
           signcolumn = 'yes:1',
           filetype = 'markdown',
           conceallevel = 3,
-        }
-      }
-    })
-  end
-}
-```
-
-### [packer.nvim](https://github.com/wbthomason/packer.nvim)
-
-```lua 
-use { 
-  'martineausimon/nvim-bard',
-  requires = 'MunifTanjim/nui.nvim',
-  config = function()
-    require('nvim-bard').setup({
-      bard_api_key = "xxxxxx",
-      mappings = {
-        toggle_bard = "<leader>b",
-        send_bard = "<cr>",
-        new_chat = "<c-n>"
-      },
-      options = {
-        top_popup_options = {
-          signcolumn = 'yes:1',
-          filetype = 'markdown',
-          conceallevel = 3,
-        }
+        },
       }
     })
   end
