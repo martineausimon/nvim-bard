@@ -9,11 +9,39 @@ function M.defaults()
       new_chat = "<c-n>"
     },
     options = {
+      ui = {
+        question = {
+          signs = {
+            sign = "",
+            hi = "Function",
+            style = "single"
+          },
+          border = {
+            style = "single",
+            text = {
+              top = "[Prompt]"
+            }
+          }
+        },
+        bard = {
+          signs = {
+            sign = "🟆",
+            hi = "Statement",
+            style = "single"
+          },
+          border = {
+            style = "single",
+            text = {
+              top = "[Bard]"
+            }
+          }
+        }
+      },
       top_popup_options = {
         signcolumn = 'yes:1',
         filetype = 'markdown',
         conceallevel = 3,
-      }
+      },
     }
   }
   return defaults
