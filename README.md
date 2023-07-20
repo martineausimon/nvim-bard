@@ -84,7 +84,7 @@ pip install bardapi
 local api_key
 local file = io.open('/home/user/.bard_api_key', 'r')
 if file then
-  local api_key = file:read()
+  api_key = file:read()
   file:close()
 end
 
