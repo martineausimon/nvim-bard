@@ -3,8 +3,10 @@ local M = {}
 function M.defaults()
   local defaults = {
     bard_api_key = "",
+    display_mode = "popup", -- "popup", "vsplit" or "tabnew"
     mappings = {
       toggle_bard = "<leader>b",
+      hide_bard = { "q", "<esc>" },
       send_bard = "<cr>",
       new_chat = "<c-n>"
     },
@@ -14,10 +16,10 @@ function M.defaults()
           signs = {
             sign = "",
             hi = "Function",
-            style = "single"
+            style = "single" -- "double", "none", "rounded", "solid"
           },
-          border = {
-            style = "single",
+          border = { -- only for "popup" mode
+            style = "single", -- "double", "none", "shadow", "rounded", "solid"
             text = {
               top = "[Prompt]"
             }
@@ -37,10 +39,11 @@ function M.defaults()
           }
         }
       },
-      top_popup_options = {
+      buffer_options = {
         signcolumn = 'yes:1',
         filetype = 'markdown',
         conceallevel = 3,
+        buftype = "nofile",
       },
     }
   }

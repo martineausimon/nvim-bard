@@ -1,23 +1,23 @@
 local Config = require('nvim-bard.config')
 local Signs = require('nvim-bard.signs')
 local Bard = require('nvim-bard.bard')
+
 local Layout = require("nui.layout")
 local Popup = require("nui.popup")
 local event = require("nui.utils.autocmd").event
 
 local send_bard = Config.options.mappings.send_bard
 local new_chat = Config.options.mappings.new_chat
-local top_popup_options = Config.options.options.top_popup_options
+local hide_bard = Config.options.mappings.hide_bard
+local buffer_options = Config.options.options.buffer_options
 local top_popup_border = Config.options.options.ui.bard.border
 local bottom_popup_border = Config.options.options.ui.question.border
 
-local bard_status
-
-local layout, top_popup, bottom_popup
+local layout, top_popup, bottom_popup, bard_status
 
 local M = {}
 
-function M.toggle_bard()
+function M.toggle()
   if bard_status == "open" then
     layout:hide()
     bard_status = "hidden"
@@ -56,7 +56,7 @@ function M.create_layout()
 
   top_popup:on(event.BufWinEnter, function()
     vim.api.nvim_buf_call(top_popup.bufnr, function()
-      for i, j in pairs(top_popup_options) do
+      for i, j in pairs(buffer_options) do
         vim.opt[i] = j
       end
       vim.cmd('hi SignColumn ctermbg=NONE guibg=NONE')
@@ -72,20 +72,31 @@ function M.create_layout()
     bard_status = nil
   end)
 
-  vim.api.nvim_buf_create_user_command(bottom_popup.bufnr, "BardReset",
-    function()
-      vim.api.nvim_buf_call(top_popup.bufnr, function()
-        vim.cmd('normal gg')
-      end)
-      Signs.del(top_popup.bufnr)
-      vim.api.nvim_buf_set_lines(bottom_popup.bufnr, 0, -1, false, {})
-      vim.api.nvim_buf_set_lines(top_popup.bufnr, 0, -1, false, {})
-    end,
-  {})
-  vim.api.nvim_buf_set_keymap(bottom_popup.bufnr, "n", new_chat, "<cmd>BardReset<cr>", {})
+  local bard_hide = function()
+    layout:hide()
+    bard_status = "hidden"
+  end
 
-  vim.api.nvim_buf_create_user_command(bottom_popup.bufnr, "BardSend", function() M.get_content() end, {})
-  vim.api.nvim_buf_set_keymap(bottom_popup.bufnr, "n", send_bard, "<cmd>BardSend<cr>", {})
+  local map = vim.keymap.set
+  local opts = { noremap = true, silent = true, buffer = bottom_popup.bufnr }
+  map("n", new_chat, function()
+    vim.api.nvim_buf_call(top_popup.bufnr, function()
+      vim.cmd('normal gg')
+    end)
+    Signs.del(top_popup.bufnr)
+    vim.api.nvim_buf_set_lines(bottom_popup.bufnr, 0, -1, false, {})
+    vim.api.nvim_buf_set_lines(top_popup.bufnr, 0, -1, false, {})
+  end, opts)
+
+  map("n", send_bard, function() M.get_content() end, opts)
+
+  if type(hide_bard) == "string" then
+    map('n', hide_bard, bard_hide, opts)
+  elseif type(hide_bard) == "table" then
+    for _, key in ipairs(hide_bard) do
+        map('n', key, bard_hide, opts)
+    end
+  end
 
   layout:mount()
 end
@@ -102,12 +113,13 @@ function M.get_content()
   if query == "" or nil then
     print("[nvim-bard] Can't send empty query")
     do return end
+  else
+    M.write_top_buffer(lines, "question")
+    vim.defer_fn(function()
+      local result = Bard.ask(query)
+      M.write_top_buffer(result, "bard")
+    end, 0)
   end
-  M.write_top_buffer(lines, "question")
-  vim.defer_fn(function()
-    local result = Bard.ask(query)
-    M.write_top_buffer(result, "bard")
-  end, 0)
 end
 
 function M.write_top_buffer(lines, type)
