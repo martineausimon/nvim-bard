@@ -29,12 +29,14 @@ pip install bardapi
 ```lua
 {
   'martineausimon/nvim-bard',
-  dependencies = 'MunifTanjim/nui.nvim',
+  dependencies = 'MunifTanjim/nui.nvim', -- only for "popup" mode
   config = function()
     require('nvim-bard').setup({
-      bard_api_key = "", -- Required
+      bard_api_key = "", --required
+      display_mode = "popup", -- "popup", "vsplit" or "tabnew"
       mappings = {
         toggle_bard = "<leader>b",
+        hide_bard = { "q", "<esc>" },
         send_bard = "<cr>",
         new_chat = "<c-n>"
       },
@@ -44,10 +46,10 @@ pip install bardapi
             signs = {
               sign = "",
               hi = "Function",
-              style = "single"
+              style = "single" -- "double", "none", "rounded", "solid"
             },
-            border = {
-              style = "single",
+            border = { -- only for "popup" mode
+              style = "single", -- "double", "none", "shadow", "rounded", "solid"
               text = {
                 top = "[Prompt]"
               }
@@ -67,10 +69,11 @@ pip install bardapi
             }
           }
         },
-        top_popup_options = {
+        buffer_options = {
           signcolumn = 'yes:1',
           filetype = 'markdown',
           conceallevel = 3,
+          buftype = "nofile",
         },
       }
     })
