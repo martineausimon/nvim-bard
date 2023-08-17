@@ -23,7 +23,8 @@ function M.defaults()
             text = {
               top = "[Prompt]"
             }
-          }
+          },
+          winhighlight = "Normal:Normal,FloatBorder:Normal"
         },
         bard = {
           signs = {
@@ -36,7 +37,8 @@ function M.defaults()
             text = {
               top = "[Bard]"
             }
-          }
+          },
+          winhighlight = "Normal:Normal,FloatBorder:Normal"
         }
       },
       buffer_options = {

@@ -11,7 +11,9 @@ local new_chat = Config.options.mappings.new_chat
 local hide_bard = Config.options.mappings.hide_bard
 local buffer_options = Config.options.options.buffer_options
 local top_popup_border = Config.options.options.ui.bard.border
+local top_popup_hi = Config.options.options.ui.bard.winhighlight
 local bottom_popup_border = Config.options.options.ui.question.border
+local bottom_popup_hi = Config.options.options.ui.question.winhighlight
 
 local layout, top_popup, bottom_popup, bard_status
 
@@ -32,12 +34,14 @@ end
 
 function M.create_layout()
   top_popup = Popup({
-    border = top_popup_border
+    border = top_popup_border,
+    win_options = { winhighlight = top_popup_hi },
   })
 
   bottom_popup = Popup({
     enter = true,
-    border = bottom_popup_border
+    border = bottom_popup_border,
+    win_options = { winhighlight = bottom_popup_hi },
   })
 
   layout = Layout(

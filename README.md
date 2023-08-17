@@ -53,7 +53,8 @@ pip install bardapi
               text = {
                 top = "[Prompt]"
               }
-            }
+            },
+            winhighlight = "Normal:Normal,FloatBorder:Normal"
           },
           bard = {
             signs = {
@@ -66,7 +67,8 @@ pip install bardapi
               text = {
                 top = "[Bard]"
               }
-            }
+            },
+            winhighlight = "Normal:Normal,FloatBorder:Normal"
           }
         },
         buffer_options = {
