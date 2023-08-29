@@ -3,28 +3,6 @@ local Config = require('nvim-bard.config')
 local M = {}
 
 local bard_api_key = Config.options.bard_api_key
-local token = string.format('py3 token = "%s"', bard_api_key)
-
-local session = [[
-python3 << END
-from bardapi import Bard
-import os
-import requests
-
-session = requests.Session()
-session.headers = {
-  "Host": "bard.google.com",
-  "X-Same-Domain": "1",
-  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-  "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-  "Origin": "https://bard.google.com",
-  "Referer": "https://bard.google.com/",
-}
-session.cookies.set("__Secure-1PSID", token) 
-
-bard = Bard(token=token, session=session, timeout=30)
-END
-]]
 
 function M.check_api_key()
   if bard_api_key == "" then
@@ -36,8 +14,25 @@ function M.check_api_key()
 end
 
 function M.load()
-  vim.fn.execute(token)
-  vim.cmd(session)
+  local py_lines = {
+    'from bardapi import Bard, SESSION_HEADERS',
+    'import os',
+    'import requests',
+    'session = requests.Session()',
+    'session.headers = SESSION_HEADERS',
+  }
+  if type(bard_api_key) == 'string' then
+    table.insert(py_lines, string.format('session.cookies.set("__Secure-1PSID", "%s")', bard_api_key))
+    table.insert(py_lines, string.format('bard = Bard(token="%s", session=session, timeout=30)', bard_api_key))
+  elseif type(bard_api_key) == 'table' then
+    table.insert(py_lines, string.format('session.cookies.set("__Secure-1PSID", "%s")', bard_api_key.psid))
+    table.insert(py_lines, string.format('session.cookies.set("__Secure-1PSIDCC", "%s")', bard_api_key.psidcc))
+    table.insert(py_lines, string.format('session.cookies.set("__Secure-1PSIDTS", "%s")', bard_api_key.psidts))
+    table.insert(py_lines, string.format('bard = Bard(token="%s", session=session, timeout=30)', bard_api_key.psid))
+  end
+  for _, line in ipairs(py_lines) do
+    vim.fn.execute(string.format('py3 %s', line))
+  end
 end
 
 function M.ask(query)
