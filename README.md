@@ -6,7 +6,7 @@
 <img src="https://user-images.githubusercontent.com/89019438/253833546-ecf7830b-c235-4cc8-9dad-9bf2615a0f41.png">
 </p>
 
-> [!DISCLAMER]
+> [!Important]
 > Writing this plugin was a lot of fun, but I don't recommend using it for anything other than experimentation.  
 > It works with bardapi which is not an official API and which can stop working at the slightest change in Bard's policy.
 > Since August, it seems that it is necessary to update the cookie values regularly.  
