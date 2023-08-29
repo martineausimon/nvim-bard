@@ -6,6 +6,12 @@
 <img src="https://user-images.githubusercontent.com/89019438/253833546-ecf7830b-c235-4cc8-9dad-9bf2615a0f41.png">
 </p>
 
+> [!IMPORTANT]
+> Writing this plugin was a lot of fun, but I don't recommend using it for anything other than experimentation.  
+> It works with bardapi which is not an official API and which can stop working at the slightest change in Bard's policy.
+> Since August, it seems that it is necessary to update the cookie values regularly.  
+> Also, this AI is quite slow and seems to me less efficient than ChatGPT for coding.
+
 ## Requirements
 
 This plugin requires `bardapi`
@@ -80,6 +86,18 @@ pip install bardapi
       }
     })
   end
+}
+```
+
+Since august, Bard has updated it's policy and settings for different regions and you may need to set bard_api_key this way, retrieving the values from `Secure-1PSID`, `Secure-1PSIDCC`, et `Secure-1PSIDTS` :
+
+```lua
+require('nvim-bard').setup({
+  bard_api_key = {
+    psid   = "xxxx",
+    psidcc = "xxxx",
+    psidts = "xxxx"
+  },
 }
 ```
 
